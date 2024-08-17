@@ -41,6 +41,8 @@ function preload () {
         { frameWidth:18, frameHeight:16}
     )
 
+    this.load.audio('gameover', 'assets/sound/music/gameover.mp3')
+
 } // 1.
 
 
@@ -70,7 +72,7 @@ function create () {
     .setGravityY(300)
 
 
-    this.physics.world.setBounds(0, 0, 2000, 1000) // aqui le damos el tamaño al mundo respectivamente 
+    this.physics.world.setBounds(0, 0, 2000, config.height) // aqui le damos el tamaño al mundo respectivamente 
     this.physics.add.collider(this.mario, this.floor)
 
     this.cameras.main.setBounds(0,0,2000,config.height) // el tamaño del mundo en cuestion de la camara posiciones, ancho y alto
@@ -85,6 +87,7 @@ function create () {
 
 function update () {
     if (this.mario.isDead) return
+
     if (this.keys.left.isDown){
         this.mario.x -= 3
         this.mario.flipX = true
@@ -97,20 +100,24 @@ function update () {
         this.mario.anims.play('mario-idle', true)
     }
     if (this.keys.up.isDown && this.mario.body.touching.down){
-        this.mario.anims.play('mario-jump', true)
         this.mario.setVelocityY(-300)
+        this.mario.anims.play('mario-jump', true)
+
     }
-    if (this.mario.y >= config.height){
-        this.mario.isDead =true
+    if (this.mario.y >= config.height) {
+        this.mario.isDead = true
         this.mario.anims.play('mario-dead')
         this.mario.setCollideWorldBounds(false)
-
+        this.sound.add('gameover', { volume: 0.2 }).play()
+    
         setTimeout(() => {
             this.mario.setVelocityY(-350)
-        },100)
+        }, 100)
+    
+        setTimeout(() => {
+            this.scene.restart()
+        }, 2000)
     }
-
-
 
 
 }
