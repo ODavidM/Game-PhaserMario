@@ -2,7 +2,7 @@
 import {createAnimations} from "/animations.js"
 
 const config = {
-    type: Phaser.AUTO,
+    type: Phaser.AUTO, // webgl, canvas
     width: 400,
     height: 300,
     backgroundColor: '#049cd8',
@@ -26,13 +26,13 @@ new Phaser.Game(config)
 
 function preload () {
     this.load.image(
-        'cloud1',
-        'assets/scenery/overworld/cloud1.png'
+        'cloud-1',
+        '/assets/scenery/overworld/cloud1.png'
     )
 
     this.load.image(
-        'floorbricks',
-        'assets/scenery/overworld/floorbricks.png'
+        'floor-bricks',
+        '/assets/scenery/overworld/floorbricks.png'
     )
 
     this.load.spritesheet(
@@ -41,26 +41,26 @@ function preload () {
         { frameWidth:18, frameHeight:16}
     )
 
-    this.load.audio('gameover', 'assets/sound/music/gameover.mp3')
+    this.load.audio('game-over', '/assets/sound/music/gameover.mp3')
 
 } // 1.
 
 
 function create () {
     // imange (x,y, id-del-asset)
-    this.add.image(100,50, 'cloud1') // la nuve y su posicon
+    this.add.image(100,50, 'cloud-1') // la nuve y su posicon
         .setOrigin(0,0)
         .setScale(0.15)
 
     this.floor = this.physics.add.staticGroup()
 
     this.floor
-        .create(180, config.height-0, 'floorbricks')
+        .create(180, config.height-0, 'floor-bricks')
         .setOrigin(0, 1)
         .refreshBody()
 
     this.floor
-        .create(0, config.height-0, 'floorbricks')
+        .create(0, config.height-0, 'floor-bricks')
         .setOrigin(0, 1)
         .refreshBody()
 
@@ -108,7 +108,7 @@ function update () {
         this.mario.isDead = true
         this.mario.anims.play('mario-dead')
         this.mario.setCollideWorldBounds(false)
-        this.sound.add('gameover', { volume: 0.2 }).play()
+        this.sound.add('game-over', { volume: 0.2 }).play()
     
         setTimeout(() => {
             this.mario.setVelocityY(-350)
@@ -119,7 +119,7 @@ function update () {
         }, 2000)
     }
 
-
+    
 }
 
 
