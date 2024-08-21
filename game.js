@@ -1,7 +1,9 @@
 /* global Phaser */
-import {createAnimations} from "/animations.js"
+import {createAnimations} from "./animations.js"
+import {checkControls} from "./controls.js"
 
 const config = {
+    autofocus: false, // para apagar el autofocus
     type: Phaser.AUTO, // webgl, canvas
     width: 400,
     height: 300,
@@ -40,6 +42,11 @@ function preload () {
         'assets/entities/mario.png',
         { frameWidth:18, frameHeight:16}
     )
+    this.load.spritesheet(
+        'goomb',
+        'assets/entities/overworld/goomba.png',
+        { frameWidth:16, frameHeight:16}
+    )
 
     this.load.audio('game-over', '/assets/sound/music/gameover.mp3')
 
@@ -67,13 +74,19 @@ function create () {
     this.isJumping = false;
 
     this.mario = this.physics.add.sprite(70,240, 'mario')    //mario posicion y gravedad
-    .setOrigin(0,1)
-    .setCollideWorldBounds(true)
-    .setGravityY(300)
-
+        .setOrigin(0,1)
+        .setCollideWorldBounds(true)
+        .setGravityY(300)
+    
+    this.enemy = this.physics.add.sprite(70, config.height - 64, 'goomb')
+        .setOrigin(0,1)
+        .setCollideWorldBounds(true)
+        .setGravityY(300)
+        .setVelocityX(-50)
 
     this.physics.world.setBounds(0, 0, 2000, config.height) // aqui le damos el tamaño al mundo respectivamente 
     this.physics.add.collider(this.mario, this.floor)
+    this.physics.add.collider(this.enemy, this.floor)
 
     this.cameras.main.setBounds(0,0,2000,config.height) // el tamaño del mundo en cuestion de la camara posiciones, ancho y alto
     this.cameras.main.startFollow(this.mario) //camara sigue a mario
@@ -86,40 +99,33 @@ function create () {
 }
 
 function update () {
-    if (this.mario.isDead) return
+    checkControls(this)
 
-    if (this.keys.left.isDown){
-        this.mario.x -= 3
-        this.mario.flipX = true
-        this.mario.anims.play('mario-walk', true)
-    }else if(this.keys.right.isDown){
-        this.mario.x += 3
-        this.mario.flipX = false
-        this.mario.anims.play('mario-walk', true)
-    }else{
-        this.mario.anims.play('mario-idle', true)
-    }
-    if (this.keys.up.isDown && this.mario.body.touching.down){
-        this.mario.setVelocityY(-300)
-        this.mario.anims.play('mario-jump', true)
+    const {mario, sound, scene} = this
 
-    }
-    if (this.mario.y >= config.height) {
-        this.mario.isDead = true
-        this.mario.anims.play('mario-dead')
-        this.mario.setCollideWorldBounds(false)
-        this.sound.add('game-over', { volume: 0.2 }).play()
+    //chek if mario is dead
+    if (mario.isDead) return
     
+    if (mario.y >= config.height) {
+        mario.isDead = true
+        mario.anims.play('mario-dead')
+        mario.setCollideWorldBounds(false)
+        try {
+            sound.add('game-over', { volume: 0.2 }).play()    
+        } catch(e){
+
+        }
+
         setTimeout(() => {
-            this.mario.setVelocityY(-350)
+            mario.setVelocityY(-350)
         }, 100)
     
         setTimeout(() => {
-            this.scene.restart()
+            scene.restart()
         }, 2000)
     }
 
-    
+
 }
 
 
